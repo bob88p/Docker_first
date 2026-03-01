@@ -1,4 +1,4 @@
-name: Kestra GCP Auth
+name: Kestra GCP Flow
 
 on:
   push:
@@ -8,18 +8,27 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  run-kestra-flow:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
 
+      # 2️⃣ Authenticate GitHub → GCP using OIDC
       - id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/589884554449/locations/global/workloadIdentityPools/github/providers/github-provider
           service_account: kestra-sa@data-eng-488900.iam.gserviceaccount.com
 
+      # 3️⃣ Setup gcloud CLI
       - uses: google-github-actions/setup-gcloud@v2
 
+      # 4️⃣ Verify authentication
       - run: gcloud auth list
+
+      # 5️⃣ Run Kestra flow
+      - name: Run Kestra GCP Flow
+        run: |
+          kestra run flows/kestra-gcp-flow.yaml
