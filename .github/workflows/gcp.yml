@@ -1,0 +1,25 @@
+name: Kestra GCP Auth
+
+on:
+  push:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/589884554449/locations/global/workloadIdentityPools/github/providers/github-provider
+          service_account: kestra-sa@data-eng-488900.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth list
